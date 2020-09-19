@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateGlob(t *testing.T) {
 	buf := &bytes.Buffer{}
-	if err := Create("tb*.go", buf); err != nil {
+	if err := Create(buf, "tb*.go"); err != nil {
 		t.Fatal(err)
 	}
 	w := ioutil.Discard
@@ -21,10 +21,23 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+func TestCreateList(t *testing.T) {
+	buf := &bytes.Buffer{}
+	if err := Create(buf, "tb.go", "tb_test.go"); err != nil {
+		t.Fatal(err)
+	}
+	w := ioutil.Discard
+	if testing.Verbose() {
+		w = os.Stdout
+	}
+	if err := ReadAll(buf, w); err != nil {
+		t.Fatal(err)
+	}
+}
 func TestReadFile(t *testing.T) {
 	const filename = "tb_test.go"
 	buf := &bytes.Buffer{}
-	if err := Create("tb*.go", buf); err != nil {
+	if err := Create(buf, "tb*.go"); err != nil {
 		t.Fatal(err)
 	}
 	onDisk, err := ioutil.ReadFile(filename)

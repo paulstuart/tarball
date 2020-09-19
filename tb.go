@@ -10,32 +10,34 @@ import (
 )
 
 // Create creates a tar globbing src
-func Create(src string, w io.Writer) error {
-	files, err := filepath.Glob(src)
-	if err != nil {
-		return err
-	}
+func Create(w io.Writer, srcs ...string) error {
 	tw := tar.NewWriter(w)
-	for _, file := range files {
-		f, err := os.Open(file)
+	for _, src := range srcs {
+		files, err := filepath.Glob(src)
 		if err != nil {
 			return err
 		}
-		stat, err := f.Stat()
-		if err != nil {
-			return err
-		}
-		hdr := &tar.Header{
-			Name: file,
-			Mode: int64(stat.Mode()),
-			Size: stat.Size(),
-		}
-		if err := tw.WriteHeader(hdr); err != nil {
-			return err
-		}
-		//if _, err := tw.Write([]byte(file.Body)); err != nil {
-		if _, err = io.Copy(tw, f); err != nil {
-			return err
+		for _, file := range files {
+			f, err := os.Open(file)
+			if err != nil {
+				return err
+			}
+			stat, err := f.Stat()
+			if err != nil {
+				return err
+			}
+			hdr := &tar.Header{
+				Name: file,
+				Mode: int64(stat.Mode()),
+				Size: stat.Size(),
+			}
+			if err := tw.WriteHeader(hdr); err != nil {
+				return err
+			}
+			//if _, err := tw.Write([]byte(file.Body)); err != nil {
+			if _, err = io.Copy(tw, f); err != nil {
+				return err
+			}
 		}
 	}
 	return tw.Close()
