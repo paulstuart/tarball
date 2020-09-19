@@ -34,6 +34,7 @@ func TestCreateList(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
 func TestReadFile(t *testing.T) {
 	const filename = "tb_test.go"
 	buf := &bytes.Buffer{}
@@ -51,5 +52,20 @@ func TestReadFile(t *testing.T) {
 	}
 	if !bytes.Equal(onDisk, out.Bytes()) {
 		t.Fatal(err)
+	}
+}
+
+func TestList(t *testing.T) {
+	buf := &bytes.Buffer{}
+	if err := Create(buf, "tb*.go"); err != nil {
+		t.Fatal(err)
+	}
+	list, err := FileList(buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const want = 2
+	if len(list) != want {
+		t.Fatalf("want %d files -- got %d\n", want, len(list))
 	}
 }

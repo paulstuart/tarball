@@ -85,3 +85,20 @@ func ReadFile(r io.Reader, w io.Writer, filename string) error {
 	}
 	return fmt.Errorf("file %q not found", filename)
 }
+
+// FileList returns the files in the archive
+func FileList(r io.Reader) ([]string, error) {
+	var list []string
+	tr := tar.NewReader(r)
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break // End of archive
+		}
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, hdr.Name)
+	}
+	return list, nil
+}
